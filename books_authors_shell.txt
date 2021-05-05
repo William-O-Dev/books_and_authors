@@ -1,0 +1,162 @@
+Query: Create 5 books with the following names: C Sharp, Java, Python, PHP, Ruby
+
+>>> c_sharp=Book.objects.create(title='C Sharp')
+>>> java=Book.objects.create(title='Java')
+>>> python=Book.objects.create(title='Python')
+>>> php=Book.objects.create(title='PHP')
+>>> ruby=Book.objects.create(title='Ruby')
+>>> Book.objects.all()
+<QuerySet [<Book: Book object (1)>, <Book: Book object (2)>, <Book: Book object (3)>, <Book: Book object (4)>, <Book: Book object (5)>]>
+
+
+Query: Create 5 different authors: Jane Austen, Emily Dickinson, Fyodor Dostoevsky, William Shakespeare, Lau Tzu
+
+>>> jane_austen=Author.objects.create(first_name='Jane', last_name='Austen')
+>>> emily_dickenson=Author.objects.create(first_name='Emily', last_name='Dickenson')
+>>> fyodor_dostoevsky=Author.objects.create(first_name='Fyodor', last_name='Dostoevsky')
+>>> william_shakespeare=Author.objects.create(first_name='William', last_name='Shakespeare')
+>>> lau_tzu=Author.objects.create(first_name='Lau', last_name='Tzu')
+>>> Author.objects.all()
+<QuerySet [<Author: Author object (1)>, <Author: Author object (2)>, <Author: Author object (3)>, <Author: Author object (4)>, <Author: Author object (5)>]>
+
+
+Add a new text field in the authors table called 'notes'.
+
+class Author(models.Model):
+    first_name = models.CharField(max_length=45)
+    last_name = models.CharField(max_length=45)
+    notes = models.TextField
+    books = models.ManyToManyField(Book, related_name='authors')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+
+Create and run the migration files to update the table in your database.
+
+C:\Users\wb_or\OneDrive\Documents\Coding Dojo\python_stack\django\django_intro\book_authors_proj>python manage.py makemigrations
+No changes detected
+
+C:\Users\wb_or\OneDrive\Documents\Coding Dojo\python_stack\django\django_intro\book_authors_proj>python manage.py migrate
+Operations to perform:
+  Apply all migrations: admin, auth, books_authors_app, contenttypes, sessions
+Running migrations:
+  No migrations to apply.
+
+C:\Users\wb_or\OneDrive\Documents\Coding Dojo\python_stack\django\django_intro\book_authors_proj>python manage.py shell
+Python 3.8.7 (tags/v3.8.7:6503f05, Dec 21 2020, 17:59:51) [MSC v.1928 64 bit (AMD64)] on win32
+Type "help", "copyright", "credits" or "license" for more information.
+(InteractiveConsole)
+>>> from books_authors_app.models import *
+>>>
+
+
+Query: Change the name of the C Sharp book to C#
+
+>>> c_sharp.title = "C#"
+>>> c_sharp.save()
+>>> c_sharp.title
+'C#'
+>>> Book.objects.get(id=1).title
+'C#'
+>>>
+
+
+Query: Change the first name of the 4th author to Bill
+
+>>> william_shakespeare = Author.objects.get(id=4)
+>>> william_shakespeare.first_name = 'Bill'
+>>> william_shakespeare.save()
+>>> william_shakespeare.first_name
+'Bill'
+>>> Author.objects.get(id=4).first_name
+'Bill'
+>>>
+
+
+Query: Assign the first author to the first 2 books
+
+>>> c_sharp
+<Book: Book object (1)>
+>>> jane_austen = Author.objects.get(id=1)
+>>> java = Book.objects.get(id=2)
+>>> jane_austen.books.add(c_sharp)
+>>> jane_austen.books.add(java)
+>>> jane_austen.books.all()
+<QuerySet [<Book: Book object (1)>, <Book: Book object (2)>]>
+>>>
+
+
+Query: Assign the second author to the first 3 books
+
+>>> emily_dickinson = Author.objects.get(id=2)
+>>> python = Book.objects.get(id=3)
+>>> emily_dickinson.books.add(c_sharp)
+>>> emily_dickinson.books.add(java)
+>>> emily_dickinson.books.add(python)
+>>> emily_dickinson.books.all()
+<QuerySet [<Book: Book object (1)>, <Book: Book object (2)>, <Book: Book object (3)>]>
+>>>
+
+
+Query: Assign the third author to the first 4 books
+
+>>> fyodor_dostoevsky = Author.objects.get(id=3)
+>>> php = Book.objects.get(id=4)
+>>> fyodor_dostoevsky.books.add(c_sharp)
+>>> fyodor_dostoevsky.books.add(java)
+>>> fyodor_dostoevsky.books.add(python)
+>>> fyodor_dostoevsky.books.add(php)
+>>> fyodor_dostoevsky.books.all()
+<QuerySet [<Book: Book object (1)>, <Book: Book object (2)>, <Book: Book object (3)>, <Book: Book object (4)>]>
+>>>
+
+
+Query: Assign the fourth author to the first 5 books (or in other words, all the books)
+
+>>> william_shakespeare.books.add(c_sharp)
+>>> william_shakespeare.books.add(java)
+>>> william_shakespeare.books.add(python)
+>>> william_shakespeare.books.add(php)
+>>> william_shakespeare.books.add(ruby)
+>>> william_shakespeare.books.all()
+<QuerySet [<Book: Book object (1)>, <Book: Book object (2)>, <Book: Book object (3)>, <Book: Book object (4)>, <Book: Book object (5)>]>
+>>>
+
+
+Query: Retrieve all the authors for the 3rd book
+
+>>> python.authors.all()
+<QuerySet [<Author: Author object (2)>, <Author: Author object (3)>, <Author: Author object (4)>]>
+>>> Book.objects.get(id=3).authors.all()
+<QuerySet [<Author: Author object (2)>, <Author: Author object (3)>, <Author: Author object (4)>]>
+>>>
+
+
+Query: Remove the first author of the 3rd book
+
+>>> Book.objects.get(id=3).authors.remove(Author.objects.get(id=2))
+>>> Book.objects.get(id=3).authors.all()
+<QuerySet [<Author: Author object (3)>, <Author: Author object (4)>]>
+>>>
+
+
+Query: Add the 5th author as one of the authors of the 2nd book
+
+>>> Author.objects.get(id=5).books.add(Book.objects.get(id=2))
+>>> Book.objects.get(id=2).authors.all()
+<QuerySet [<Author: Author object (1)>, <Author: Author object (2)>, <Author: Author object (3)>, <Author: Author object (4)>, <Author: Author object (5)>]>
+>>>
+
+
+Query: Find all the books that the 3rd author is part of
+
+>>> Author.objects.get(id=3).books.all()
+<QuerySet [<Book: Book object (1)>, <Book: Book object (2)>, <Book: Book object (3)>, <Book: Book object (4)>]>
+>>>
+
+
+Query: Find all the authors that contributed to the 5th book
+
+>>> Book.objects.get(id=5).authors.all()
+<QuerySet [<Author: Author object (4)>]>
+>>>

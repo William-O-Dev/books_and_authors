@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Single Author Page</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+
+<body>
+    <div id='wrapper'>
+        <div id='info'>
+            <h1>{{ author.first_name }} {{author.last_name }}</h1>
+            <h2>ID: {{ author.id }}</h2>
+            <h2>Notes: {{ author.notes }}</h2>
+            <h2>Books:</h2>
+            <ul>
+                {% for book in author.books.all %}
+                <li><span>{{ book.title }}</span></li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <div id='book_select'>
+            <form action="/author/{{ author.id }}/edit_author" method="POST">
+                {% csrf_token %}
+                <label for='book_id'></label>
+                <select name='book_id' id='book_id'>
+                    <option>--Add a book--</option>
+                    {% for book in books %}
+                    <option value='{{ book.id }}'>{{ book.title }}
+                    </option>
+                    {% endfor %}
+                </select>
+                <button>Add</button>
+            </form>
+        </div>
+    </div>
+</body>
+
+</html>
